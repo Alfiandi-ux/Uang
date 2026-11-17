@@ -1,8 +1,25 @@
 # UANG
 
-Catatan keuangan pribadi bergaya **neo-brutalism** yang berjalan sepenuhnya offline di browser. Tanpa akun, tanpa server, tanpa pelacakan. Semua data tersimpan di perangkatmu.
+Catatan keuangan pribadi bergaya **neo-brutalism** yang berjalan sepenuhnya offline. Tanpa akun, tanpa server, tanpa pelacakan. Semua data tersimpan di perangkatmu.
 
-Dibangun dengan HTML, CSS, dan JavaScript murni (ES modules) — tanpa framework, tanpa proses build.
+Tersedia dalam bentuk **Aplikasi Android (.apk)** dan **Aplikasi Web / PWA**.
+
+---
+
+## 📱 Unduh Aplikasi Android (APK)
+
+Kamu bisa langsung memasang UANG di HP Android mana pun tanpa perlu server atau Termux!
+
+[![Download APK](https://img.shields.io/badge/Download-Uang.apk-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Alfiandi-ux/Uang/releases/latest/download/Uang.apk)
+
+👉 **[Unduh Uang.apk Versi Terbaru](https://github.com/Alfiandi-ux/Uang/releases/latest/download/Uang.apk)**
+
+### Cara Pasang di Android:
+1. Unduh berkas **`Uang.apk`** dari tautan di atas (atau melalui menu [Releases](https://github.com/Alfiandi-ux/Uang/releases)).
+2. Buka berkas yang telah didownload (dari notifikasi browser atau aplikasi File Manager / Files).
+3. Jika muncul dialog *"Demi keamanan, ponsel Anda tidak diizinkan menginstal aplikasi yang tidak dikenal dari sumber ini"*, ketuk **Setelan / Pengaturan**, lalu aktifkan **Izinkan dari sumber ini**.
+4. Ketuk **Instal**.
+5. Selesai! Aplikasi **UANG** akan muncul di layar utama / menu aplikasi HP dan siap digunakan offline kapan saja.
 
 ---
 

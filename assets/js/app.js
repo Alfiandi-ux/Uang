@@ -295,6 +295,10 @@ function clearFormError(form) {
 }
 
 function downloadFile(filename, content, type) {
+  if (window.AndroidBridge && typeof window.AndroidBridge.downloadFile === 'function') {
+    window.AndroidBridge.downloadFile(filename, content, type);
+    return;
+  }
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');

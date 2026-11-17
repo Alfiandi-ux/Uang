@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.alfiandi.uang'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.alfiandi.uang"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("release.keystore")
+            storePassword "REDACTED"
+            keyAlias "uang"
+            keyPassword "REDACTED"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.webkit:webkit:1.10.0'
+}
+
+// Copy root web app assets automatically into APK assets before build
+tasks.register('syncWebAssets', Copy) {
+    from("${projectDir}/../../") {
+        include 'index.html'
+        include 'manifest.webmanifest'
+        include 'sw.js'
+        include 'icon.svg'
+        include 'icon-*.png'
+        include 'assets/**'
+    }
+    into "${projectDir}/src/main/assets"
+}
+
+preBuild.dependsOn(syncWebAssets)
