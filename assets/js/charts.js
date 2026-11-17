@@ -1,6 +1,6 @@
 /* UANG — grafik SVG tanpa dependensi */
 
-import { compactNumber, monthShort, niceMax } from './format.js';
+import { compactNumber, escapeHTML, monthShort, niceMax } from './format.js';
 
 const INK = 'var(--ink)';
 const GRID = 'var(--chart-grid)';
@@ -84,7 +84,7 @@ export function donutSVG(slices, { size = 188, thickness = 36 } = {}) {
     accumulated += fraction;
     return `<circle cx="${center}" cy="${center}" r="${radius}" fill="none"
       stroke="${slice.color}" stroke-width="${thickness}" stroke-dasharray="${dash}"
-      stroke-dashoffset="${offset.toFixed(2)}"><title>${slice.label}: ${compactNumber(slice.value)}</title></circle>`;
+      stroke-dashoffset="${offset.toFixed(2)}"><title>${escapeHTML(slice.label)}: ${compactNumber(slice.value)}</title></circle>`;
   }).join('');
 
   return `

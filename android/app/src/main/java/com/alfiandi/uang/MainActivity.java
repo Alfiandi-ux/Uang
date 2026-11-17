@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -29,8 +30,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.webkit.WebViewAssetLoader;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -38,13 +37,27 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private ActivityResultLauncher<Intent> fileChooserLauncher;
+    private ActivityResultLauncher<Intent> createDocumentLauncher;
+    private PendingDownload pendingDownload;
+
+    private static final class PendingDownload {
+        final String filename;
+        final String content;
+        final String mimeType;
+
+        PendingDownload(String filename, String content, String mimeType) {
+            this.filename = filename;
+            this.content = content;
+            this.mimeType = mimeType;
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // File picker for JSON backup import
+        // File picker untuk impor cadangan JSON.
         fileChooserLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -68,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
             }
         );
 
+        // Penyimpanan cadangan di Android 7–9 memakai SAF, tanpa izin storage.
+        createDocumentLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                PendingDownload download = pendingDownload;
+                pendingDownload = null;
+                if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || download == null) {
+                    return;
+                }
+                Uri uri = result.getData().getData();
+                if (uri == null) return;
+                try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+                    if (out == null) throw new IllegalStateException("Tidak bisa membuka berkas tujuan.");
+                    out.write(download.content.getBytes(StandardCharsets.UTF_8));
+                    Toast.makeText(this, "Berkas disimpan: " + download.filename, Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Gagal menyimpan berkas: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        );
+
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
 
@@ -76,14 +110,33 @@ public class MainActivity extends AppCompatActivity {
         setupBackNavigation();
     }
 
+    private boolean isSystemDark() {
+        int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return mode == Configuration.UI_MODE_NIGHT_YES;
+    }
+
     private void setupStatusBar() {
+        applyNativeTheme(isSystemDark());
+    }
+
+    private void applyNativeTheme(boolean dark) {
         Window window = getWindow();
+        int background = Color.parseColor(dark ? "#14120F" : "#F2EEE3");
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.parseColor("#F2EEE3"));
+        window.setStatusBarColor(background);
+        window.setNavigationBarColor(background);
+
+        View decor = window.getDecorView();
+        int flags = decor.getSystemUiVisibility();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            View decor = window.getDecorView();
-            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            if (dark) flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            else flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (dark) flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            else flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+        decor.setSystemUiVisibility(flags);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -92,14 +145,15 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
-        settings.setAllowFileAccess(true);
+        settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(true);
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
 
-        // Bridge to export backup JSON & CSV to Android Downloads
+        // Bridge untuk ekspor cadangan/CSV dan sinkronisasi warna status bar.
         webView.addJavascriptInterface(new AndroidBridge(), "AndroidBridge");
 
         final WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
@@ -148,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Load root app via modern secure WebViewAssetLoader
+        // Aset lokal dimuat lewat origin https yang aman dan di-intercept.
         webView.loadUrl("https://appassets.androidplatform.net/assets/index.html");
     }
 
@@ -156,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // If a modal/dialog is open, simulate Escape key to close it first
+                // Kalau ada dialog, tutup dialog dulu lewat Escape.
                 webView.evaluateJavascript(
                     "(function() { " +
                     "  var modal = document.querySelector('.modal-overlay'); " +
@@ -181,63 +235,103 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public class AndroidBridge {
-        @JavascriptInterface
-        public void downloadFile(String filename, String content, String mimeType) {
-            runOnUiThread(() -> {
-                try {
-                    saveFile(filename, content, mimeType);
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "Gagal menyimpan berkas: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+    private String baseMimeType(String mimeType) {
+        if (mimeType == null || mimeType.trim().isEmpty()) return "application/octet-stream";
+        int semicolon = mimeType.indexOf(';');
+        String base = semicolon >= 0 ? mimeType.substring(0, semicolon) : mimeType;
+        return base.trim().isEmpty() ? "application/octet-stream" : base.trim();
     }
 
-    private void saveFile(String filename, String content, String mimeType) {
-        boolean success = false;
+    private String safeFilename(String filename) {
+        String name = filename == null ? "" : filename.trim();
+        if (name.isEmpty()) name = "uang-export.txt";
+        return name.replaceAll("[\\\\/:*?\"<>|]", "-");
+    }
+
+    private void handleDownload(String filename, String content, String mimeType) {
+        String safeName = safeFilename(filename);
+        String safeContent = content == null ? "" : content;
+        String safeMime = baseMimeType(mimeType);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (!saveToDownloads(safeName, safeContent, safeMime)) {
+                shareContent(safeName, safeContent, safeMime);
+            }
+            return;
+        }
+
+        // Android 7–9: pengguna memilih lokasi lewat sistem, tanpa izin storage.
+        launchCreateDocument(safeName, safeContent, safeMime);
+    }
+
+    private boolean saveToDownloads(String filename, String content, String mimeType) {
+        Uri uri = null;
+        try {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
             values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
             values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-            Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            values.put(MediaStore.Downloads.IS_PENDING, 1);
+
+            uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) return false;
+
+            try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+                if (out == null) {
+                    getContentResolver().delete(uri, null, null);
+                    return false;
+                }
+                out.write(content.getBytes(StandardCharsets.UTF_8));
+            }
+
+            ContentValues done = new ContentValues();
+            done.put(MediaStore.Downloads.IS_PENDING, 0);
+            getContentResolver().update(uri, done, null, null);
+            Toast.makeText(this, "Berkas disimpan di Unduhan: " + filename, Toast.LENGTH_LONG).show();
+            return true;
+        } catch (Exception e) {
             if (uri != null) {
-                try (OutputStream out = getContentResolver().openOutputStream(uri)) {
-                    if (out != null) {
-                        out.write(content.getBytes(StandardCharsets.UTF_8));
-                        success = true;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                try { getContentResolver().delete(uri, null, null); } catch (Exception ignored) { }
             }
-        } else {
-            try {
-                File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                if (!downloadsDir.exists()) downloadsDir.mkdirs();
-                File targetFile = new File(downloadsDir, filename);
-                try (FileOutputStream fos = new FileOutputStream(targetFile)) {
-                    fos.write(content.getBytes(StandardCharsets.UTF_8));
-                    success = true;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return false;
+        }
+    }
+
+    private void launchCreateDocument(String filename, String content, String mimeType) {
+        pendingDownload = new PendingDownload(filename, content, mimeType);
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, filename);
+        try {
+            createDocumentLauncher.launch(intent);
+            Toast.makeText(this, "Pilih lokasi penyimpanan berkas.", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            pendingDownload = null;
+            shareContent(filename, content, mimeType);
+        }
+    }
+
+    private void shareContent(String filename, String content, String mimeType) {
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType(mimeType);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, filename);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, content);
+            startActivity(Intent.createChooser(shareIntent, "Simpan / Bagikan " + filename));
+        } catch (Exception ignored) {
+        }
+    }
+
+    public class AndroidBridge {
+        @JavascriptInterface
+        public void downloadFile(String filename, String content, String mimeType) {
+            runOnUiThread(() -> handleDownload(filename, content, mimeType));
         }
 
-        if (success) {
-            Toast.makeText(this, "Berkas disimpan di Unduhan: " + filename, Toast.LENGTH_LONG).show();
-        } else {
-            // Fallback: share sheet
-            try {
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType(mimeType);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, content);
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, filename);
-                startActivity(Intent.createChooser(shareIntent, "Simpan / Bagikan " + filename));
-            } catch (Exception ignored) {
-            }
+        @JavascriptInterface
+        public void setTheme(String theme) {
+            runOnUiThread(() -> applyNativeTheme("dark".equals(theme)));
         }
     }
 }

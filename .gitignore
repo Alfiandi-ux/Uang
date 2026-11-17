@@ -20,5 +20,9 @@ release-output/
 *.apk
 *.aab
 
-# Do not ignore release keystore
-!android/app/release.keystore
+# Signing material — jangan pernah commit
+android/keystore/
+android/keystore.properties
+android/app/release.keystore
+*.jks
+*.keystore

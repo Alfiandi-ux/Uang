@@ -8,7 +8,7 @@ Tersedia dalam bentuk **Aplikasi Android (.apk)** dan **Aplikasi Web / PWA**.
 
 ## 📱 Unduh Aplikasi Android (APK)
 
-Kamu bisa langsung memasang UANG di HP Android mana pun tanpa perlu server atau Termux!
+Kamu bisa langsung memasang UANG di HP Android **7.0 ke atas** tanpa perlu server atau Termux!
 
 [![Download APK](https://img.shields.io/badge/Download-Uang.apk-2ea44f?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Alfiandi-ux/Uang/releases/latest/download/Uang.apk)
 
@@ -20,6 +20,37 @@ Kamu bisa langsung memasang UANG di HP Android mana pun tanpa perlu server atau 
 3. Jika muncul dialog *"Demi keamanan, ponsel Anda tidak diizinkan menginstal aplikasi yang tidak dikenal dari sumber ini"*, ketuk **Setelan / Pengaturan**, lalu aktifkan **Izinkan dari sumber ini**.
 4. Ketuk **Instal**.
 5. Selesai! Aplikasi **UANG** akan muncul di layar utama / menu aplikasi HP dan siap digunakan offline kapan saja.
+
+> **Catatan rilis v1.1.0:** mulai versi ini UANG memakai kunci rilis baru. Jika kamu pernah memasang v1.0.0, **ekspor cadangan JSON dulu**, lalu hapus aplikasi lama sebelum memasang APK baru karena tanda tangannya berbeda. Setelah itu pulihkan cadangan di v1.1.0.
+
+### Menandatangani APK (untuk rilis)
+
+Kunci rilis **tidak disimpan di repo**. Jangan pernah commit `android/keystore/` atau `android/keystore.properties`.
+
+- Build lokal membaca `android/keystore.properties` (sudah diabaikan git), atau environment variable:
+  `UANG_KEYSTORE_PATH`, `UANG_KEYSTORE_PASSWORD`, `UANG_KEY_ALIAS`, `UANG_KEY_PASSWORD`.
+- GitHub Actions membaca secrets:
+  `UANG_KEYSTORE_BASE64`, `UANG_KEYSTORE_PASSWORD`, `UANG_KEY_ALIAS`, `UANG_KEY_PASSWORD`.
+
+Untuk melihat nilai yang perlu dimasukkan ke GitHub Secrets:
+
+```bash
+cd ~/uang
+./android/scripts/signing-secrets.sh
+```
+
+Kalau perlu membuat kunci baru:
+
+```bash
+cd ~/uang/android
+keytool -genkeypair -v -keystore keystore/release.jks -alias uang \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -dname "CN=UANG, OU=App, O=Alfiandi, C=ID"
+```
+
+Lalu isi `android/keystore.properties` seperti contoh di `android/keystore.properties.example`.
+
+> Workflow hanya membuat GitHub Release saat kamu push tag `v*` (misalnya `v1.1.0`). Push ke `main` hanya menghasilkan artifact APK, tidak menimpa rilis lama.
 
 ---
 
@@ -88,6 +119,8 @@ Pintasan tidak aktif saat sedang mengetik di kolom input.
 
 - Data disimpan di **localStorage** browser dengan kunci `uang.v1`.
 - Tidak ada akun, server, analitik, atau permintaan jaringan selain memuat berkas aplikasi.
+- APK tidak meminta izin **INTERNET** maupun penyimpanan. Ekspor cadangan memakai Storage Access Framework (Android 7–9) atau MediaStore Downloads (Android 10+).
+- Backup sistem Android dimatikan (`allowBackup="false"`) agar data keuangan tidak ikut tersalin ke cloud secara otomatis.
 - Menghapus data situs di browser akan **menghapus semua catatan**. Unduh cadangan JSON secara berkala.
 - Cadangan JSON berisi seluruh transaksi, dompet, kategori, anggaran, dan pengaturan. Simpan di tempat aman.
 - Impor akan **mengganti** seluruh data yang ada, bukan menggabungkannya.
@@ -108,6 +141,7 @@ uang/
 ├── icon.svg                   # ikon vektor
 ├── icon-*.png                 # ikon PWA (reguler & maskable)
 ├── README.md
+├── android/                   # proyek WebView Android + build APK
 └── assets/
     ├── styles.css             # sistem visual neo-brutalism + responsif
     ├── fonts/                 # Archivo & Space Mono (self-hosted)
@@ -135,7 +169,7 @@ node --check assets/js/charts.js
 **Setelah mengubah aset**, naikkan versi cache di `sw.js`:
 
 ```js
-const CACHE = 'uang-v1.0.4';
+const CACHE = 'uang-v1.1.0';
 ```
 
 Lalu muat ulang halaman dua kali (atau tutup semua tab aplikasi) agar service worker baru mengambil alih. Tanpa menaikkan versi, browser bisa tetap menyajikan berkas lama dari cache.
@@ -153,6 +187,7 @@ Lalu muat ulang halaman dua kali (atau tutup semua tab aplikasi) agar service wo
 - Satu perangkat, satu browser. Tidak ada sinkronisasi antarperangkat.
 - Kapasitas localStorage umumnya sekitar 5 MB — cukup untuk puluhan ribu transaksi, tetapi bukan arsip jangka panjang tanpa cadangan.
 - Pemasangan PWA dan mode offline memerlukan HTTPS atau `localhost`.
+- APK membutuhkan Android 7.0+ (minSdk 24).
 
 ---
 

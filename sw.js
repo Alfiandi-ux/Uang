@@ -1,6 +1,6 @@
 /* UANG — service worker (offline-first) */
 
-const CACHE = 'uang-v1.0.3';
+const CACHE = 'uang-v1.1.0';
 const ASSETS = [
   './',
   './index.html',

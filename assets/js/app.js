@@ -40,6 +40,9 @@ const ui = {
 
 let deferredInstallPrompt = null;
 
+// Di dalam APK, aset sudah offline dan fitur pasang PWA tidak relevan.
+const isNativeApp = Boolean(window.AndroidBridge && typeof window.AndroidBridge.downloadFile === 'function');
+
 /* -------------------------------------------------------------------------- */
 /* Utilitas tampilan                                                          */
 /* -------------------------------------------------------------------------- */
@@ -295,9 +298,9 @@ function clearFormError(form) {
 }
 
 function downloadFile(filename, content, type) {
-  if (window.AndroidBridge && typeof window.AndroidBridge.downloadFile === 'function') {
+  if (isNativeApp) {
     window.AndroidBridge.downloadFile(filename, content, type);
-    return;
+    return true;
   }
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
@@ -308,6 +311,7 @@ function downloadFile(filename, content, type) {
   anchor.click();
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return false;
 }
 
 function csvCell(value) {
@@ -333,6 +337,9 @@ function applyTheme() {
   document.documentElement.dataset.theme = theme;
   const meta = $('meta[name="theme-color"]');
   if (meta) meta.content = theme === 'dark' ? '#14120F' : '#F2EEE3';
+  if (isNativeApp && typeof window.AndroidBridge.setTheme === 'function') {
+    window.AndroidBridge.setTheme(theme);
+  }
 }
 
 function applyPrivacy() {
@@ -979,6 +986,15 @@ function viewPengaturan() {
   const expenseCats = state.categories.filter((category) => category.kind === 'expense');
   const incomeCats = state.categories.filter((category) => category.kind === 'income');
 
+  const installRow = isNativeApp ? '' : `
+      <div class="setting-row">
+        <div class="setting-row__text">
+          <strong>Pemasangan</strong>
+          <span>Pasang UANG ke layar utama agar seperti aplikasi.</span>
+        </div>
+        <button type="button" class="btn btn--sm" data-action="install">${icon('install', 'icon--sm')} Pasang</button>
+      </div>`;
+
   const themeSeg = `
     <div class="seg" role="group" aria-label="Tema tampilan">
       ${[['light', 'Terang'], ['dark', 'Gelap'], ['auto', 'Auto']].map(([value, label]) => `
@@ -1018,18 +1034,12 @@ function viewPengaturan() {
           <span class="switch__dot"></span>
         </button>
       </div>
-      <div class="setting-row">
-        <div class="setting-row__text">
-          <strong>Pemasangan</strong>
-          <span>Pasang UANG ke layar utama agar seperti aplikasi.</span>
-        </div>
-        <button type="button" class="btn btn--sm" data-action="install">${icon('install', 'icon--sm')} Pasang</button>
-      </div>
+      ${installRow}
     </section>
 
     <section class="card">
       <div class="card-head">
-        <div><span class="card-kicker">Tentang</span><h2 class="card-title">UANG v1.0</h2></div>
+        <div><span class="card-kicker">Tentang</span><h2 class="card-title">UANG v1.1</h2></div>
         <span class="badge badge--green">Offline</span>
       </div>
       <ul class="about-list">
@@ -1084,6 +1094,15 @@ function viewLainnya() {
   const budget = store.budgetSummary(currentMonthKey());
   const remaining = budget.total > 0 ? budget.remaining : 0;
 
+  const installRow = isNativeApp ? '' : `
+      <div class="setting-row">
+        <div class="setting-row__text">
+          <strong>Pasang di layar utama</strong>
+          <span>Buka seperti aplikasi biasa, tetap bisa offline.</span>
+        </div>
+        <button type="button" class="btn btn--sm" data-action="install">${icon('install', 'icon--sm')} Pasang</button>
+      </div>`;
+
   return `<div class="stack" style="gap:20px">
     <section class="card card--accent accounts-total">
       <div>
@@ -1120,15 +1139,9 @@ function viewLainnya() {
     <section class="card">
       <div class="card-head">
         <div><span class="card-kicker">Tentang</span><h2 class="card-title">Dibuat untuk dipakai</h2></div>
-        <span class="badge badge--green">v1.0</span>
+        <span class="badge badge--green">v1.1</span>
       </div>
-      <div class="setting-row">
-        <div class="setting-row__text">
-          <strong>Pasang di layar utama</strong>
-          <span>Buka seperti aplikasi biasa, tetap bisa offline.</span>
-        </div>
-        <button type="button" class="btn btn--sm" data-action="install">${icon('install', 'icon--sm')} Pasang</button>
-      </div>
+      ${installRow}
       <div class="setting-row">
         <div class="setting-row__text">
           <strong>Privasi</strong>
@@ -1152,7 +1165,7 @@ function showWelcome() {
     size: 'md',
     body: `
       <div class="welcome">
-        <div class="welcome__sticker-row"><span class="sticker">UANG v1.0 \u00b7 offline</span></div>
+        <div class="welcome__sticker-row"><span class="sticker">UANG v1.1 \u00b7 offline</span></div>
         <h2>Uangmu, <span>rapi.</span></h2>
         <p>Catat pemasukan dan pengeluaran, atur anggaran, lalu lihat ke mana uangmu pergi. Semua tanpa akun dan tanpa internet.</p>
         <ul class="welcome__list">
@@ -1766,8 +1779,8 @@ function openCategoryModal(id = null, defaultKind = 'expense') {
 
 function exportJSON() {
   const payload = store.exportPayload();
-  downloadFile(`uang-cadangan-${todayISO()}.json`, JSON.stringify(payload, null, 2), 'application/json');
-  toast('Cadangan JSON diunduh.');
+  const handled = downloadFile(`uang-cadangan-${todayISO()}.json`, JSON.stringify(payload, null, 2), 'application/json');
+  if (!handled) toast('Cadangan JSON diunduh.');
 }
 
 function exportCSV(month = null) {
@@ -1795,8 +1808,8 @@ function exportCSV(month = null) {
     ].map(csvCell).join(','));
   }
   const suffix = month ? `-${month}` : '';
-  downloadFile(`uang-transaksi${suffix}-${todayISO()}.csv`, `\uFEFF${lines.join('\r\n')}`, 'text/csv;charset=utf-8');
-  toast('CSV transaksi diunduh.');
+  const handled = downloadFile(`uang-transaksi${suffix}-${todayISO()}.csv`, `\uFEFF${lines.join('\r\n')}`, 'text/csv;charset=utf-8');
+  if (!handled) toast('CSV transaksi diunduh.');
 }
 
 async function handleImportFile(event) {
@@ -1837,6 +1850,10 @@ async function handleImportFile(event) {
 }
 
 async function installApp() {
+  if (isNativeApp) {
+    toast('UANG sudah terpasang sebagai aplikasi Android.');
+    return;
+  }
   if (!deferredInstallPrompt) {
     toast('Buka menu browser lalu pilih \u201cTambahkan ke layar utama\u201d.', 'warn');
     return;
@@ -2165,6 +2182,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', (
 
 function setupInstall() {
   const button = $('#install-btn');
+  if (isNativeApp) {
+    if (button) button.hidden = true;
+    return;
+  }
   if (window.matchMedia('(display-mode: standalone)').matches && button) button.hidden = true;
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
@@ -2178,7 +2199,23 @@ function setupInstall() {
   });
 }
 
+function disableNativeServiceWorker() {
+  if (!isNativeApp) return;
+  // APK sudah membawa aset lokal. Bersihkan cache SW lama agar update tidak tertahan.
+  if ('serviceWorker' in navigator) {
+    if (typeof navigator.serviceWorker.getRegistrations === 'function') {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+        .catch(() => {});
+    }
+  }
+  if (window.caches && typeof caches.keys === 'function') {
+    caches.keys().then((keys) => keys.forEach((key) => caches.delete(key))).catch(() => {});
+  }
+}
+
 function registerServiceWorker() {
+  if (isNativeApp) return;
   if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -2204,6 +2241,7 @@ function init() {
 
   render();
   setupInstall();
+  disableNativeServiceWorker();
   registerServiceWorker();
   if (store.isFirstRun) showWelcome();
   else handleShortcutAction();
