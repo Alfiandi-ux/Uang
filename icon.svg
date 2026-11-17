@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Ikon UANG">
+  <rect width="512" height="512" fill="#FFD23F"/>
+  <rect x="17" y="17" width="478" height="478" fill="none" stroke="#161412" stroke-width="34"/>
+  <circle cx="270" cy="269" r="150" fill="#161412"/>
+  <circle cx="256" cy="256" r="150" fill="#FFFCF4" stroke="#161412" stroke-width="27"/>
+  <circle cx="256" cy="256" r="129" fill="none" stroke="#161412" stroke-width="6"/>
+  <text x="256" y="271" text-anchor="middle" dominant-baseline="middle" fill="#161412" font-family="'Archivo Black', 'Arial Black', Helvetica, sans-serif" font-weight="900" font-size="166" letter-spacing="-8">Rp</text>
+  <path d="M376 139l8.5 26 26 8.5-26 8.5-8.5 26-8.5-26-26-8.5 26-8.5z" fill="#161412"/>
+  <path d="M129 340l6 18.5 18.5 6-18.5 6-6 18.5-6-18.5-18.5-6 18.5-6z" fill="#161412"/>
+</svg>
