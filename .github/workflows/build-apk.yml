@@ -1,0 +1,76 @@
+name: Build & Release Android APK
+
+    on:
+      push:
+        branches: [ main ]
+        tags: [ 'v*' ]
+      workflow_dispatch:
+
+    permissions:
+      contents: write
+
+    jobs:
+      build:
+        name: Build UANG APK
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+
+          - name: Set up JDK 17
+            uses: actions/setup-java@v4
+            with:
+              distribution: 'temurin'
+              java-version: '17'
+
+          - name: Set up Gradle 8.5
+            uses: gradle/actions/setup-gradle@v3
+            with:
+              gradle-version: '8.5'
+
+          - name: Build Release APK
+            run: |
+              cd android
+              gradle assembleRelease --no-daemon
+              cd ..
+              mkdir -p dist
+              cp
+              android/app/build/outputs/apk/release/app-release
+              .apk dist/Uang.apk
+
+          - name: Upload APK Artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: Uang-APK
+              path: dist/Uang.apk
+
+          - name: Publish GitHub Release
+            uses: softprops/action-gh-release@v2
+            with:
+              tag_name: v1.0.0
+              name: "UANG v1.0.0"
+              draft: false
+              prerelease: false
+              files: dist/Uang.apk
+              body: |
+                ## 📱 Unduh UANG untuk Android (.apk)
+
+                Aplikasi pencatatan keuangan pribadi **UANG**
+                bergaya neo-brutalism, 100% offline, tanpa
+                akun, tanpa server.
+
+                ### ⬇️ Download
+                -
+                **[Uang.apk](https://github.com/Alfiandi-ux/Uan
+                g/releases/latest/download/Uang.apk)**
+
+                ### 🚀 Cara Pasang di HP Android:
+                1. Unduh berkas **`Uang.apk`** di atas.
+                2. Buka file APK yang sudah didownload.
+                3. Jika muncul konfirmasi keamanan, aktifkan
+                **Izinkan dari sumber ini** (*Allow unknown
+                apps*).
+                4. Tekan **Pasang / Install**.
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
