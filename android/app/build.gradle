@@ -24,8 +24,8 @@ android {
         applicationId "com.alfiandi.uang"
         minSdk 24
         targetSdk 34
-        versionCode ((System.getenv('UANG_VERSION_CODE') ?: '2').toInteger())
-        versionName (System.getenv('UANG_VERSION_NAME') ?: '1.1.0')
+        versionCode ((System.getenv('UANG_VERSION_CODE') ?: '3').toInteger())
+        versionName (System.getenv('UANG_VERSION_NAME') ?: '1.2.0')
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

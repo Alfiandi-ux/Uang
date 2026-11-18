@@ -1,6 +1,6 @@
 # UANG
 
-Catatan keuangan pribadi bergaya **neo-brutalism** yang berjalan sepenuhnya offline. Tanpa akun, tanpa server, tanpa pelacakan. Semua data tersimpan di perangkatmu.
+Catatan keuangan pribadi bergaya **claymorphism pastel** yang lembut, estetik, dan berjalan sepenuhnya offline. Tanpa akun, tanpa server, tanpa pelacakan. Semua data tersimpan di perangkatmu.
 
 Tersedia dalam bentuk **Aplikasi Android (.apk)** dan **Aplikasi Web / PWA**.
 

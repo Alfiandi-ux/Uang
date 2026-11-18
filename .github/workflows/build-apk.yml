@@ -87,17 +87,22 @@ jobs:
           prerelease: false
           files: dist/Uang.apk
           body: |
-            ## 📱 UANG ${{ github.ref_name }}
+            ## 📱 UANG ${{ github.ref_name }} — Edisi Claymorphism Pastel
 
-            Aplikasi pencatatan keuangan pribadi **UANG** bergaya neo-brutalism, 100% offline, tanpa akun, tanpa server.
+            Aplikasi pencatatan keuangan pribadi **UANG** bergaya **Claymorphism Pastel**, 100% offline, tanpa akun, tanpa server. Desain baru yang empuk, 3D lembut, dan estetik!
 
-            ### ⬇️ Download
+            ### ⬇️ Download APK
             - **[Uang.apk](https://github.com/Alfiandi-ux/Uang/releases/latest/download/Uang.apk)**
 
-            ### 🚀 Cara Pasang di HP Android:
-            1. Unduh berkas **`Uang.apk`** di atas.
-            2. Buka file APK yang sudah didownload.
-            3. Jika muncul konfirmasi keamanan, aktifkan **Izinkan dari sumber ini** (*Allow unknown apps*).
-            4. Tekan **Pasang / Install**.
+            ### ✨ Yang Baru di Versi Ini:
+            - 🎨 **Tema Claymorphism & Warna Pastel:** Tampilan baru dengan efek 3D timbul (*inflated clay*), dual inset shadow, dan palet warna pastel yang nyaman di mata.
+            - 🫧 **Komponen Tactile:** Sudut membulat halus pada semua kartu, tombol, dan formulir dengan feedback interaktif saat disentuh.
+            - 📊 **Grafik Kapsul & Donut Bersih:** Visualisasi keuangan lebih elegan tanpa garis hitam tebal.
+            - 📱 **Navigasi Mengambang & FAB 3D:** Tab bar bawah mengambang dengan efek frosted glass serta floating button 3D clay.
 
-            > APK ini memakai kunci rilis baru (mulai v1.1.0). Jika sebelumnya memasang v1.0.0, ekspor cadangan JSON dulu, lalu hapus aplikasi lama karena tanda tangannya berbeda. Setelah memasang v1.1.0, pulihkan cadangan.
+            ### 🚀 Cara Pasang di HP Android:
+            1. Unduh berkas **`Uang.apk`** dari tautan di atas.
+            2. Buka berkas APK yang telah didownload.
+            3. Jika muncul konfirmasi keamanan, aktifkan **Izinkan dari sumber ini** (*Allow unknown apps*).
+            4. Tekan **Instal / Pasang**.
+            5. Selesai! UANG siap digunakan secara offline.

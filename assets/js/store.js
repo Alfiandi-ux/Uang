@@ -44,8 +44,8 @@ export const ACCOUNT_TYPES = {
 };
 
 export const PALETTE = [
-  '#FFD23F', '#0FB981', '#3D5BFF', '#FF5D57',
-  '#A96CFF', '#FF9F1C', '#14B8A6', '#EC4899',
+  '#C4B5FD', '#86EFAC', '#7DD3FC', '#FDA4AF',
+  '#FDE047', '#FDBA74', '#99F6E4', '#F9A8D4',
 ];
 
 export const EMOJI_CHOICES = [
@@ -56,34 +56,34 @@ export const EMOJI_CHOICES = [
 
 function defaultCategories() {
   return [
-    { id: 'cat-makan', name: 'Makan & Minum', kind: 'expense', icon: '🍜', color: '#FF9F1C' },
-    { id: 'cat-transport', name: 'Transportasi', kind: 'expense', icon: '🛵', color: '#3D5BFF' },
-    { id: 'cat-belanja', name: 'Belanja', kind: 'expense', icon: '🛍️', color: '#FF5D57' },
-    { id: 'cat-tagihan', name: 'Tagihan', kind: 'expense', icon: '🧾', color: '#A96CFF' },
-    { id: 'cat-tempat', name: 'Tempat Tinggal', kind: 'expense', icon: '🏠', color: '#0FB981' },
-    { id: 'cat-hiburan', name: 'Hiburan', kind: 'expense', icon: '🎬', color: '#EC4899' },
-    { id: 'cat-kesehatan', name: 'Kesehatan', kind: 'expense', icon: '💊', color: '#14B8A6' },
-    { id: 'cat-pendidikan', name: 'Pendidikan', kind: 'expense', icon: '📚', color: '#0EA5E9' },
-    { id: 'cat-lainnya', name: 'Lainnya', kind: 'expense', icon: '✳️', color: '#8B8375' },
-    { id: 'cat-gaji', name: 'Gaji', kind: 'income', icon: '💼', color: '#0FB981' },
-    { id: 'cat-freelance', name: 'Freelance', kind: 'income', icon: '🧑‍💻', color: '#3D5BFF' },
-    { id: 'cat-investasi', name: 'Investasi', kind: 'income', icon: '📈', color: '#A96CFF' },
-    { id: 'cat-pemasukan-lain', name: 'Pemasukan Lain', kind: 'income', icon: '💰', color: '#FF9F1C' },
+    { id: 'cat-makan', name: 'Makan & Minum', kind: 'expense', icon: '🍜', color: '#FDBA74' },
+    { id: 'cat-transport', name: 'Transportasi', kind: 'expense', icon: '🛵', color: '#7DD3FC' },
+    { id: 'cat-belanja', name: 'Belanja', kind: 'expense', icon: '🛍️', color: '#FDA4AF' },
+    { id: 'cat-tagihan', name: 'Tagihan', kind: 'expense', icon: '🧾', color: '#C4B5FD' },
+    { id: 'cat-tempat', name: 'Tempat Tinggal', kind: 'expense', icon: '🏠', color: '#86EFAC' },
+    { id: 'cat-hiburan', name: 'Hiburan', kind: 'expense', icon: '🎬', color: '#F9A8D4' },
+    { id: 'cat-kesehatan', name: 'Kesehatan', kind: 'expense', icon: '💊', color: '#99F6E4' },
+    { id: 'cat-pendidikan', name: 'Pendidikan', kind: 'expense', icon: '📚', color: '#93C5FD' },
+    { id: 'cat-lainnya', name: 'Lainnya', kind: 'expense', icon: '✳️', color: '#94A3B8' },
+    { id: 'cat-gaji', name: 'Gaji', kind: 'income', icon: '💼', color: '#86EFAC' },
+    { id: 'cat-freelance', name: 'Freelance', kind: 'income', icon: '🧑‍💻', color: '#7DD3FC' },
+    { id: 'cat-investasi', name: 'Investasi', kind: 'income', icon: '📈', color: '#C4B5FD' },
+    { id: 'cat-pemasukan-lain', name: 'Pemasukan Lain', kind: 'income', icon: '💰', color: '#FDE047' },
   ];
 }
 
 function starterAccounts() {
   return [
-    { id: 'acc-tunai', name: 'Tunai', type: 'cash', initialBalance: 0, color: '#FFD23F' },
-    { id: 'acc-bca', name: 'Rekening', type: 'bank', initialBalance: 0, color: '#3D5BFF' },
+    { id: 'acc-tunai', name: 'Tunai', type: 'cash', initialBalance: 0, color: '#FDE047' },
+    { id: 'acc-bca', name: 'Rekening', type: 'bank', initialBalance: 0, color: '#7DD3FC' },
   ];
 }
 
 function demoAccounts() {
   return [
-    { id: 'acc-tunai', name: 'Tunai', type: 'cash', initialBalance: 350000, color: '#FFD23F' },
-    { id: 'acc-bca', name: 'BCA', type: 'bank', initialBalance: 4250000, color: '#3D5BFF' },
-    { id: 'acc-gopay', name: 'GoPay', type: 'ewallet', initialBalance: 225000, color: '#0FB981' },
+    { id: 'acc-tunai', name: 'Tunai', type: 'cash', initialBalance: 350000, color: '#FDE047' },
+    { id: 'acc-bca', name: 'BCA', type: 'bank', initialBalance: 4250000, color: '#7DD3FC' },
+    { id: 'acc-gopay', name: 'GoPay', type: 'ewallet', initialBalance: 225000, color: '#86EFAC' },
   ];
 }
 

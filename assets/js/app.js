@@ -336,7 +336,7 @@ function applyTheme() {
   const theme = resolvedTheme();
   document.documentElement.dataset.theme = theme;
   const meta = $('meta[name="theme-color"]');
-  if (meta) meta.content = theme === 'dark' ? '#14120F' : '#F2EEE3';
+  if (meta) meta.content = theme === 'dark' ? '#121620' : '#F0F3F8';
   if (isNativeApp && typeof window.AndroidBridge.setTheme === 'function') {
     window.AndroidBridge.setTheme(theme);
   }
@@ -1039,7 +1039,7 @@ function viewPengaturan() {
 
     <section class="card">
       <div class="card-head">
-        <div><span class="card-kicker">Tentang</span><h2 class="card-title">UANG v1.1</h2></div>
+        <div><span class="card-kicker">Tentang</span><h2 class="card-title">UANG v1.2</h2></div>
         <span class="badge badge--green">Offline</span>
       </div>
       <ul class="about-list">
@@ -1139,7 +1139,7 @@ function viewLainnya() {
     <section class="card">
       <div class="card-head">
         <div><span class="card-kicker">Tentang</span><h2 class="card-title">Dibuat untuk dipakai</h2></div>
-        <span class="badge badge--green">v1.1</span>
+        <span class="badge badge--green">v1.2</span>
       </div>
       ${installRow}
       <div class="setting-row">
@@ -1165,7 +1165,7 @@ function showWelcome() {
     size: 'md',
     body: `
       <div class="welcome">
-        <div class="welcome__sticker-row"><span class="sticker">UANG v1.1 \u00b7 offline</span></div>
+        <div class="welcome__sticker-row"><span class="sticker">UANG v1.2 \u00b7 offline</span></div>
         <h2>Uangmu, <span>rapi.</span></h2>
         <p>Catat pemasukan dan pengeluaran, atur anggaran, lalu lihat ke mana uangmu pergi. Semua tanpa akun dan tanpa internet.</p>
         <ul class="welcome__list">

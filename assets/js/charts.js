@@ -33,12 +33,12 @@ export function barChartSVG(series, { width = 720, height = 250 } = {}) {
     const bars = [
       point.income > 0 ? `
         <rect class="chart-bar chart-bar--income" x="${(center - barW - gap / 2).toFixed(1)}" y="${(baseY - incomeH).toFixed(1)}"
-          width="${barW.toFixed(1)}" height="${Math.max(2, incomeH).toFixed(1)}" style="animation-delay:${delay}">
+          width="${barW.toFixed(1)}" height="${Math.max(2, incomeH).toFixed(1)}" rx="6" ry="6" style="animation-delay:${delay}">
           <title>Pemasukan ${monthShort(point.key)}: ${compactNumber(point.income)}</title>
         </rect>` : '',
       point.expense > 0 ? `
         <rect class="chart-bar chart-bar--expense" x="${(center + gap / 2).toFixed(1)}" y="${(baseY - expenseH).toFixed(1)}"
-          width="${barW.toFixed(1)}" height="${Math.max(2, expenseH).toFixed(1)}" style="animation-delay:${delay}">
+          width="${barW.toFixed(1)}" height="${Math.max(2, expenseH).toFixed(1)}" rx="6" ry="6" style="animation-delay:${delay}">
           <title>Pengeluaran ${monthShort(point.key)}: ${compactNumber(point.expense)}</title>
         </rect>` : '',
     ].join('');
@@ -63,8 +63,8 @@ export function donutSVG(slices, { size = 188, thickness = 36 } = {}) {
       <div class="donut-wrap donut-wrap--empty">
         <svg class="donut" viewBox="0 0 ${size} ${size}" role="img" aria-label="Belum ada pengeluaran">
           <circle cx="${size / 2}" cy="${size / 2}" r="${(size - thickness) / 2 - 8}" fill="none" stroke="var(--surface-2)" stroke-width="${thickness}" />
-          <circle cx="${size / 2}" cy="${size / 2}" r="${(size - thickness) / 2 - 8}" fill="none" stroke="${INK}" stroke-width="2.5" />
-          <circle cx="${size / 2}" cy="${size / 2}" r="${(size + thickness) / 2 - 8}" fill="none" stroke="${INK}" stroke-width="2.5" />
+          <circle cx="${size / 2}" cy="${size / 2}" r="${(size - thickness) / 2 - 8}" fill="none" stroke="var(--chart-ring, rgba(255,255,255,0.6))" stroke-width="1.5" />
+          <circle cx="${size / 2}" cy="${size / 2}" r="${(size + thickness) / 2 - 8}" fill="none" stroke="var(--chart-ring, rgba(255,255,255,0.6))" stroke-width="1.5" />
           <text x="${size / 2}" y="${size / 2 - 2}" text-anchor="middle" class="donut-total" style="font-size:30px">—</text>
           <text x="${size / 2}" y="${size / 2 + 22}" text-anchor="middle" class="donut-sub">TOTAL</text>
         </svg>
@@ -92,8 +92,8 @@ export function donutSVG(slices, { size = 188, thickness = 36 } = {}) {
       <svg class="donut" viewBox="0 0 ${size} ${size}" role="img" aria-label="Komposisi pengeluaran per kategori">
         <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="var(--surface-2)" stroke-width="${thickness}" />
         <g transform="rotate(-90 ${center} ${center})">${segments}</g>
-        <circle cx="${center}" cy="${center}" r="${radius + thickness / 2}" fill="none" stroke="${INK}" stroke-width="2.5" />
-        <circle cx="${center}" cy="${center}" r="${radius - thickness / 2}" fill="none" stroke="${INK}" stroke-width="2.5" />
+        <circle cx="${center}" cy="${center}" r="${radius + thickness / 2}" fill="none" stroke="var(--chart-ring, rgba(255,255,255,0.6))" stroke-width="1.5" />
+        <circle cx="${center}" cy="${center}" r="${radius - thickness / 2}" fill="none" stroke="var(--chart-ring, rgba(255,255,255,0.6))" stroke-width="1.5" />
         <text x="${center}" y="${center + 1}" text-anchor="middle" class="donut-total amount">${compactNumber(total)}</text>
         <text x="${center}" y="${center + 22}" text-anchor="middle" class="donut-sub">TOTAL</text>
       </svg>
@@ -120,8 +120,8 @@ export function sparklineSVG(values, { width = 320, height = 68 } = {}) {
   return `
     <svg class="sparkline" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="Tren pengeluaran kumulatif">
       <path class="spark-area" d="${area}" fill="var(--spark-fill)" stroke="none" />
-      <path class="spark-line" d="${line}" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
-      <circle class="spark-dot" cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="4.2" fill="var(--yellow)" stroke="${INK}" stroke-width="2.4" />
+      <path class="spark-line" d="${line}" fill="none" stroke="var(--purple, ${INK})" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round" />
+      <circle class="spark-dot" cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="4.5" fill="var(--surface)" stroke="var(--purple, ${INK})" stroke-width="2.5" />
     </svg>`;
 }
 
