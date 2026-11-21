@@ -21,7 +21,7 @@ Kamu bisa langsung memasang UANG di HP Android **7.0 ke atas** tanpa perlu serve
 4. Ketuk **Instal**.
 5. Selesai! Aplikasi **UANG** akan muncul di layar utama / menu aplikasi HP dan siap digunakan offline kapan saja.
 
-> **Catatan rilis v1.1.0:** mulai versi ini UANG memakai kunci rilis baru. Jika kamu pernah memasang v1.0.0, **ekspor cadangan JSON dulu**, lalu hapus aplikasi lama sebelum memasang APK baru karena tanda tangannya berbeda. Setelah itu pulihkan cadangan di v1.1.0.
+> **Catatan rilis v1.1.0:** mulai versi ini UANG memakai kunci rilis baru. Rilis **v1.0.0 sudah ditarik** karena kunci tanda tangannya pernah terekspos. Jika kamu pernah memasang v1.0.0, **ekspor cadangan JSON dulu**, lalu hapus aplikasi lama sebelum memasang APK v1.2.0 karena tanda tangannya berbeda. Setelah itu pulihkan cadangan.
 
 ### Menandatangani APK (untuk rilis)
 
@@ -51,6 +51,12 @@ keytool -genkeypair -v -keystore keystore/release.jks -alias uang \
 Lalu isi `android/keystore.properties` seperti contoh di `android/keystore.properties.example`.
 
 > Workflow hanya membuat GitHub Release saat kamu push tag `v*` (misalnya `v1.1.0`). Push ke `main` hanya menghasilkan artifact APK, tidak menimpa rilis lama.
+
+### Keamanan kunci rilis
+
+- Kunci rilis v1.0.0 (`android/app/release.keystore`) beserta password-nya pernah tidak sengaja ter-commit. Kunci itu **sudah dicabut dan diganti** sejak v1.1.0, rilis v1.0.0 sudah dihapus, dan seluruh jejaknya sudah dibersihkan dari riwayat git.
+- Kunci yang dipakai sekarang tidak pernah masuk repo; hanya tersimpan di mesin lokal dan GitHub Secrets.
+- Kalau kamu punya clone lama repo ini, **clone ulang** karena riwayat git telah ditulis ulang (SHA commit berubah).
 
 ---
 
